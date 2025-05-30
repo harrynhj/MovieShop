@@ -71,7 +71,42 @@ namespace Infrastructure.Migrations
                     b.ToTable("Genres");
                 });
 
-            modelBuilder.Entity("ApplicationCore.Entities.Movie", b =>
+            modelBuilder.Entity("ApplicationCore.Entities.MovieCasts", b =>
+                {
+                    b.Property<int>("MovieId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CastId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Character")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("MovieId", "CastId");
+
+                    b.HasIndex("CastId");
+
+                    b.ToTable("MovieCasts");
+                });
+
+            modelBuilder.Entity("ApplicationCore.Entities.MovieGenres", b =>
+                {
+                    b.Property<int>("GenreId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MovieId")
+                        .HasColumnType("int");
+
+                    b.HasKey("GenreId", "MovieId");
+
+                    b.HasIndex("MovieId");
+
+                    b.ToTable("MovieGenres");
+                });
+
+            modelBuilder.Entity("ApplicationCore.Entities.Movies", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -142,39 +177,123 @@ namespace Infrastructure.Migrations
                     b.ToTable("Movies");
                 });
 
-            modelBuilder.Entity("ApplicationCore.Entities.MovieCasts", b =>
+            modelBuilder.Entity("ApplicationCore.Entities.Reviews", b =>
                 {
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
                     b.Property<int>("MovieId")
                         .HasColumnType("int");
 
-                    b.Property<int>("CastId")
-                        .HasColumnType("int");
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("Character")
+                    b.Property<decimal>("Rating")
+                        .HasColumnType("decimal(3,2)");
+
+                    b.Property<string>("ReviewText")
                         .IsRequired()
-                        .HasMaxLength(450)
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("MovieId", "CastId");
-
-                    b.HasIndex("CastId");
-
-                    b.ToTable("MovieCasts");
-                });
-
-            modelBuilder.Entity("ApplicationCore.Entities.MovieGenres", b =>
-                {
-                    b.Property<int>("GenreId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("MovieId")
-                        .HasColumnType("int");
-
-                    b.HasKey("GenreId", "MovieId");
+                    b.HasKey("UserId", "MovieId");
 
                     b.HasIndex("MovieId");
 
-                    b.ToTable("MovieGenres");
+                    b.ToTable("Reviews");
+                });
+
+            modelBuilder.Entity("ApplicationCore.Entities.Trailers", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("MovieId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(2084)
+                        .HasColumnType("nvarchar(2084)");
+
+                    b.Property<string>("TrailerUrl")
+                        .IsRequired()
+                        .HasMaxLength(2084)
+                        .HasColumnType("nvarchar(2084)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MovieId");
+
+                    b.ToTable("Trailers");
+                });
+
+            modelBuilder.Entity("ApplicationCore.Entities.Users", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime?>("DateOfBirth")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<string>("HashedPassword")
+                        .IsRequired()
+                        .HasMaxLength(1024)
+                        .HasColumnType("nvarchar(1024)");
+
+                    b.Property<bool>("IsLocked")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasMaxLength(16)
+                        .HasColumnType("nvarchar(16)");
+
+                    b.Property<string>("ProfilePictureUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Salt")
+                        .IsRequired()
+                        .HasMaxLength(1024)
+                        .HasColumnType("nvarchar(1024)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("MoviesUsers", b =>
+                {
+                    b.Property<int>("MovieId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("MovieId", "UserId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Favorites", (string)null);
                 });
 
             modelBuilder.Entity("ApplicationCore.Entities.MovieCasts", b =>
@@ -185,7 +304,7 @@ namespace Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ApplicationCore.Entities.Movie", "Movie")
+                    b.HasOne("ApplicationCore.Entities.Movies", "Movie")
                         .WithMany("MovieCasts")
                         .HasForeignKey("MovieId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -204,7 +323,7 @@ namespace Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ApplicationCore.Entities.Movie", "Movie")
+                    b.HasOne("ApplicationCore.Entities.Movies", "Movie")
                         .WithMany("MovieGenres")
                         .HasForeignKey("MovieId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -213,6 +332,51 @@ namespace Infrastructure.Migrations
                     b.Navigation("Genre");
 
                     b.Navigation("Movie");
+                });
+
+            modelBuilder.Entity("ApplicationCore.Entities.Reviews", b =>
+                {
+                    b.HasOne("ApplicationCore.Entities.Movies", "Movie")
+                        .WithMany("Reviews")
+                        .HasForeignKey("MovieId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ApplicationCore.Entities.Users", "User")
+                        .WithMany("Reviews")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Movie");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("ApplicationCore.Entities.Trailers", b =>
+                {
+                    b.HasOne("ApplicationCore.Entities.Movies", "Movie")
+                        .WithMany()
+                        .HasForeignKey("MovieId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Movie");
+                });
+
+            modelBuilder.Entity("MoviesUsers", b =>
+                {
+                    b.HasOne("ApplicationCore.Entities.Movies", null)
+                        .WithMany()
+                        .HasForeignKey("MovieId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ApplicationCore.Entities.Users", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("ApplicationCore.Entities.Casts", b =>
@@ -225,11 +389,18 @@ namespace Infrastructure.Migrations
                     b.Navigation("MovieGenres");
                 });
 
-            modelBuilder.Entity("ApplicationCore.Entities.Movie", b =>
+            modelBuilder.Entity("ApplicationCore.Entities.Movies", b =>
                 {
                     b.Navigation("MovieCasts");
 
                     b.Navigation("MovieGenres");
+
+                    b.Navigation("Reviews");
+                });
+
+            modelBuilder.Entity("ApplicationCore.Entities.Users", b =>
+                {
+                    b.Navigation("Reviews");
                 });
 #pragma warning restore 612, 618
         }

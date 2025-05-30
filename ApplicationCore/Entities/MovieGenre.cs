@@ -3,16 +3,14 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ApplicationCore.Entities;
 
-[Table("MovieCasts")]
-public class MovieCasts
+[Table("MovieGenres")]
+public class MovieGenre
 {
-    public int CastId { get; set; }
-    [MaxLength(450)]
-    public string Character { get; set; }
+    public int GenreId { get; set; }
     public int MovieId { get; set; }
     
     
-    public Casts Casts { get; set; }
+    public Genre Genre { get; set; }
     public Movie Movie { get; set; }
 
 }

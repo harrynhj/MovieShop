@@ -1,8 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ApplicationCore.Entities;
-
-public class Casts
+[Table("Casts")]
+public class Cast
 {
     public int Id { get; set; }
     public String Gender { get; set; }
@@ -12,5 +13,5 @@ public class Casts
     public String ProfilePath { get; set; }
     public String TmdbUrl { get; set; }
     
-    public ICollection<MovieCasts> MovieCasts { get; set; }
+    public ICollection<MovieCast> MovieCast { get; set; }
 }

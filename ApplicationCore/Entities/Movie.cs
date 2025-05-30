@@ -1,5 +1,4 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ApplicationCore.Entities;
@@ -53,6 +52,9 @@ public class Movie
 
     public DateTime? UpdatedDate { get; set; }
     
-    public ICollection<MovieGenres> MovieGenres { get; set; }
-    public ICollection<MovieCasts> MovieCasts { get; set; }
+    public ICollection<MovieGenre> MovieGenre { get; set; }
+    public ICollection<MovieCast> MovieCast { get; set; }
+    public ICollection<User> User{ get; set; }
+    
+    public ICollection<Review> Review { get; set; }
 }

@@ -10,5 +10,5 @@ public class Genre
     [MaxLength(24)]
     public string Name { get; set; }
     
-    public ICollection<MovieGenres> MovieGenres { get; set; }
+    public ICollection<MovieGenre> MovieGenre { get; set; }
 }
