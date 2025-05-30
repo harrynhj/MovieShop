@@ -26,4 +26,6 @@ public class User
     
     public ICollection<Movie> Movie { get; set; }
     public ICollection<Review> Review { get; set; }
+    public ICollection<Purchase> Purchase { get; set; }
+    public ICollection<Role> Role{ get; set; }
 }
