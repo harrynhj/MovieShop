@@ -1,8 +1,87 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
-}
+﻿@using ApplicationCore.Models
+@model ApplicationCore.Models.PaginatedModel<MovieCardModel>
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+
+<div class="rounded">
+    <div class="container-fluid">
+        <div class="row bg-light">
+            @foreach (var movie in Model.Items)
+            { 
+                <partial name="_MovieCard" model="movie"/>
+            } 
+        </div>
+    </div>
+    
+    @{
+        int currentPage = Model.CurrentIndex;
+        int totalPages = Model.TotalPages;
+
+        int maxPageButtons = 5;
+        int startPage = Math.Max(1, currentPage - 2);
+        int endPage = Math.Min(totalPages, currentPage + 2);
+        
+        if (totalPages > maxPageButtons)
+        {
+            if (currentPage <= 3)
+            {
+                startPage = 1;
+                endPage = 5;
+            }
+            else if (currentPage >= totalPages - 2)
+            {
+                startPage = totalPages - 4;
+                endPage = totalPages;
+            }
+        }
+    }
+    
+    <nav>
+        <ul class="pagination justify-content-left">
+
+            <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                <a class="page-link" asp-action="Index" asp-route-page="1" asp-route-genre="@Model.Genre">«</a>
+            </li>
+            <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                <a class="page-link" asp-action="Index" asp-route-page="@(currentPage - 1)" asp-route-genre="@Model.Genre">‹</a>
+            </li>
+
+            @if (startPage > 1)
+            {
+                <li class="page-item">
+                    <a class="page-link" asp-action="Index" asp-route-page="1" asp-route-genre="@Model.Genre">1</a>
+                </li>
+                <li class="page-item disabled">
+                    <span class="page-link">...</span>
+                </li>
+            }
+
+            @for (int i = startPage; i <= endPage; i++)
+            {
+                <li class="page-item @(i == currentPage ? "active" : "")">
+                    <a class="page-link" asp-action="Index" asp-route-page="@i" asp-route-genre="@Model.Genre">@i</a>
+                </li>
+            }
+
+            @if (endPage < totalPages)
+            {
+                <li class="page-item disabled">
+                    <span class="page-link">...</span>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" asp-action="Index" asp-route-page="@totalPages" asp-route-genre="@Model.Genre">@totalPages</a>
+                </li>
+            }
+
+            <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+                <a class="page-link" asp-action="Index" asp-route-page="@(currentPage + 1)" asp-route-genre="@Model.Genre">›</a>
+            </li>
+            <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+                <a class="page-link" asp-action="Index" asp-route-page="@totalPages" asp-route-genre="@Model.Genre">»</a>
+            </li>
+
+        </ul>
+    </nav>
+
 </div>
+
+

@@ -1,6 +1,8 @@
-﻿namespace ApplicationCore.Contracts.Repository;
+﻿using ApplicationCore.Entities;
 
-public interface IUserRepository
+namespace ApplicationCore.Contracts.Repository;
+
+public interface IUserRepository : IRepository<User>
 {
     
 }

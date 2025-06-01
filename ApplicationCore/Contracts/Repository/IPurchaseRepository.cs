@@ -1,6 +1,8 @@
-﻿namespace ApplicationCore.Contracts.Repository;
+﻿using ApplicationCore.Entities;
 
-public interface IPurchaseRepository
+namespace ApplicationCore.Contracts.Repository;
+
+public interface IPurchaseRepository : IRepository<Purchase>
 {
     
 }

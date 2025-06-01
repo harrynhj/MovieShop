@@ -1,6 +1,8 @@
-﻿namespace ApplicationCore.Contracts.Repository;
+﻿using ApplicationCore.Entities;
 
-public interface ICastRepository
+namespace ApplicationCore.Contracts.Repository;
+
+public interface ICastRepository : IRepository<Cast>
 {
     
 }

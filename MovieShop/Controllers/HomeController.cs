@@ -8,28 +8,21 @@ namespace MovieShop.Controllers;
 
 public class HomeController : Controller
 {
-    private readonly ILogger<HomeController> _logger;
     private readonly IMovieService _movieService;
     
-    public HomeController(ILogger<HomeController> logger, IMovieService movieService)
+    public HomeController(IMovieService movieService)
     {
-        _logger = logger;
         _movieService = movieService;
     }
     
 
-    public IActionResult Index()
+    public IActionResult Index(int page = 1, int genre = -1)
     {
-        var movieService = new MovieService();
-        
-        return View();
+        // var movies= _movieService.GetTop20GrossingMovies();
+        var movies = _movieService.GetMoviesByPage(page, genre);
+        return View(movies);
     }
-
-    public IActionResult Privacy()
-    {
-        return View();
-    }
-
+    
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()
     {
