@@ -1,0 +1,140 @@
+@model ApplicationCore.Models.MovieDetailsModel;
+
+<style>
+    .BackDropImage {
+        background-image: url(@Model.BackDropUrl);
+        background-size: cover;
+        background-position: center;
+        position: relative;
+        color: white;
+    }
+    .BackDropImage::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        right: 0;
+        left: 0;
+        background-color: rgba(0, 0, 0, 0.6);
+        z-index: 1;
+    }
+    .content-layer {
+        position: relative;
+        z-index: 2;
+    }
+     .btn-fixed {
+         min-width: 130px;
+     }
+</style>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+
+<div class="container mt-5">
+    <div class="row BackDropImage py-4">
+        <div class="col-md-4 content-layer">
+            <img src="@Model.PosterURL" alt="@Model.Title" class="img-fluid rounded" />
+        </div>
+        <div class="col-md-4 content-layer">
+            <h2>@Model.Title</h2>
+            <p class="text-white-50 fw-light fs-6">@Model.TagLine</p>
+
+            <div class="col-md-4 d-flex align-items-center" style="gap: 1rem; min-width: 0;">
+                <p class="text-white-50 fw-bold fs-6 m-0 flex-shrink-0 text-start" style="white-space: nowrap;">
+                    @Model.Runtime m | @Model.ReleaseDate?.ToString("yyyy")
+                </p>
+                <p class="text-white-50 fw-bold fs-6 m-0 text-end" style="white-space: nowrap; min-width: 0; flex: 1;">
+                    @foreach (var g in @Model.Genres) {
+                        <span class="badge rounded-pill bg-secondary text-white mx-1">@g</span>
+                    }
+                </p>
+            </div>
+            <span class="text-white fw-bold fs-6 bg-success rounded px-3 py-1 mt-3 d-inline-block">
+                @(Model.Rating == -1 ? "N/A" : Model.Rating.ToString())
+            </span>
+
+
+            <p class="mt-3">
+                <strong>Overview:</strong> @Model.Overview
+            </p>
+        </div>
+        <div class="col-md-4 content-layer d-flex flex-column align-items-center gap-4">
+            <button class="btn btn-outline-light px-4 py-2 fw-bold btn-fixed">REVIEW</button>
+            <button class="btn btn-light px-4 py-2 fw-bold btn-fixed">
+                BUY @(Model.Price.HasValue ? $"${Model.Price.Value:0.##}" : "$0.00")
+            </button>
+        </div>
+    </div>
+    <div class="row py-4">
+        <div class="col-md-4 content-layer bg-light p-3 rounded">
+            <h6 class="fw-bold border-bottom pb-2">MOVIE FACTS</h6>
+            <ul class="list-unstyled mt-3">
+                <li class="d-flex align-items-center border-bottom border-secondary py-2">
+                    <i class="bi bi-calendar me-2"></i>
+                    <span class="me-2">Release Date</span>
+                    <span class="badge bg-dark text-white">@(Model.ReleaseDate.HasValue ? Model.ReleaseDate.Value.ToString("yyyy-MM-dd") : "N/A")
+                    </span>
+                </li>
+                <li class="d-flex align-items-center border-bottom border-secondary py-2">
+                    <i class="bi bi-hourglass-split me-2"></i>
+                    <span class="me-2">Run Time</span>
+                    <span class="badge bg-dark text-white">@Model.Runtime m</span>
+                </li>
+                <li class="d-flex align-items-center border-bottom border-secondary py-2">
+                    <i class="bi bi-cash-coin me-2"></i>
+                    <span class="me-2">Box Office</span>
+                    <span class="badge bg-dark text-white">$@Model.Revenue?.ToString("N2")</span>
+                </li>
+                <li class="d-flex align-items-center border-bottom border-secondary py-2">
+                    <i class="bi bi-currency-dollar me-2"></i>
+                    <span class="me-2">Budget</span>
+                    <span class="badge bg-dark text-white">$@Model.Budget?.ToString("N2")</span>
+                </li>
+            </ul>
+            <h6 class="fw-bold border-bottom pb-2">TRAILERS</h6>
+            <ul class="list-unstyled mt-3">
+                    @foreach (var t in @Model.Trailer)
+                    {
+                        
+                        <li class="d-flex align-items-center border-bottom border-secondary py-2">
+                            <i class="bi bi-youtube me-2"></i>
+                            <a href="@t.Url" class="text-decoration-none text-black " style="font-family: 'Times New Roman',serif">
+                                <span class="me-2">@t.Title</span>
+                            </a>
+                        </li>
+                    }
+            </ul>
+        </div>
+        <div class="col-md-8 content-layer">
+            <h6 class="fw-bold border-bottom pb-2">CASTS</h6>
+            <ul class="list-unstyled mt-3">
+                @foreach (var c in @Model.Cast)
+                {
+                    <li class="d-flex align-items-center border-bottom py-2">
+                        <img src="@c.AvatarUrl" alt="Avatar image" class="me-3" style="width: 32px; height: 45px; border-radius: 50%;">
+                        <div class="row w-100" style="font-family: 'Times New Roman', serif;">
+                            <div class="col-6">
+                                <a asp-controller="Cast" asp-action="Details" asp-route-id="@c.CastId" class="text-decoration-none text-black">
+                                    <span>@c.CastName</span>
+                                </a>
+                            </div>
+                            <div class="col-6" style="color: #333;">
+                                @c.CharacterName
+                            </div>
+                        </div>
+                    </li>
+                }
+            </ul>
+        </div>
+    </div>
+    
+</div>
+
+
+@* <a asp-action="Edit" asp-controller="Movies" asp-route-id ="@Model.Id" *@
+@*    class="btn btn-primary me-2">Edit</a> *@
+@* <form asp-action="DeleteMovie" asp-controller="Movies" asp-route-id="@Model.Id" method="post" class="mt-2"> *@
+@*     <button type="submit" class="btn bg-danger" onclick="return confirm('Are you sure you want to delete  this movie?')"> *@
+@*         Delete *@
+@*     </button> *@
+@* </form> *@
