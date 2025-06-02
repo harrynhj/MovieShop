@@ -2,6 +2,7 @@
 using ApplicationCore.Entities;
 using ApplicationCore.Models;
 using Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories;
 
@@ -75,5 +76,24 @@ public class MovieRepository : Repository<Movie>, IMovieRepository
             .Where(r => r.MovieId == id)
             .ToList();
         return reviews;
+    }
+
+    public IEnumerable<Trailer> GetMovieTrailers(int id)
+    {
+        var trailers = _movieShopDbContext.Trailers
+            .Where(t => t.MovieId == id)
+            .Distinct()
+            .ToList();
+        return trailers;
+    }
+
+    public IEnumerable<MovieCast> GetMovieCasts(int movieId)
+    {
+        var casts = _movieShopDbContext.MovieCasts
+            .Include(mc => mc.Cast)
+            .Where(mc => mc.MovieId == movieId)
+            .ToList();
+
+        return casts;
     }
 }

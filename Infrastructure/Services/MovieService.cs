@@ -58,6 +58,8 @@ public class MovieService : IMovieService
         var movie = _movieRepository.GetById(id);
         var genres = GetMovieGenres(id);
         var score = GetMovieRating(id);
+        var trailers = GetMovieTrailers(id);
+        var cast = GetMovieCasts(id);
         if (movie != null)
         {
             var movieDetailsModel = new MovieDetailsModel()
@@ -77,7 +79,9 @@ public class MovieService : IMovieService
                 TagLine = movie.Tagline,
                 Revenue = movie.Revenue,
                 Genres = genres,
-                Rating = score
+                Rating = score,
+                Trailer = trailers,
+                Cast = cast
             };
             return movieDetailsModel;
         }
@@ -124,7 +128,7 @@ public class MovieService : IMovieService
         var reviews =  _movieRepository.GetMovieRating(id);
         if (reviews.Count() == 0)
         {
-            return 0;
+            return -1;
         }
         foreach (var review in reviews)
         {
@@ -132,4 +136,44 @@ public class MovieService : IMovieService
         }
         return ratings.Sum() / ratings.Count;
     }
+
+    public List<TrailerModel> GetMovieTrailers(int id)
+    {
+        List<TrailerModel> res = new List<TrailerModel>();
+        var trailers = _movieRepository.GetMovieTrailers(id);
+        foreach (var trailer in trailers)
+        {
+            res.Add(new TrailerModel()
+            {
+                Title = trailer.Name,
+                Url = trailer.TrailerUrl
+            });
+        }
+        return res;
+    }
+
+    public List<MovieCastModel> GetMovieCasts(int id)
+    {
+        List<MovieCastModel> res = new List<MovieCastModel>();
+        var casts = _movieRepository.GetMovieCasts(id);
+        foreach (var cast in casts)
+        {
+            res.Add(new MovieCastModel()
+            {
+                CastId = cast.CastId,
+                CastName = cast.Cast.Name,
+                CharacterName = cast.Character,
+                AvatarUrl = cast.Cast.ProfilePath,
+                TmdbUrl = cast.Cast.TmdbUrl
+            });
+        }
+        return res;
+    }
 }
+//
+// public int Id { get; set; }
+// public string Gender  { get; set; }
+// public string Name { get; set; }
+// public string ProfilePath { get; set; }
+// public string TmdbUrl { get; set; }
+// public List<MovieCardModel> Movies { get; set; }

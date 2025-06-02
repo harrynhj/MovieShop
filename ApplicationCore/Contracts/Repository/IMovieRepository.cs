@@ -11,4 +11,6 @@ public interface IMovieRepository: IRepository<Movie>
     int GetMovieCount(int genre = -1);
     IEnumerable<int> GetMoviesGenres(int genre);
     IEnumerable<Review> GetMovieRating(int id);
+    IEnumerable<Trailer> GetMovieTrailers(int id);
+    IEnumerable<MovieCast> GetMovieCasts(int id);
 }

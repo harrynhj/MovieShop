@@ -14,7 +14,11 @@ public class CastRepository : Repository<Cast>, ICastRepository
 
     public override Cast GetById(int id)
     {
-        return _movieShopDbContext.Set<Cast>().Include(m => m.MovieCast).FirstOrDefault(c => c.Id == id);
+        var cast = _movieShopDbContext.Set<Cast>()
+            .Include(c => c.MovieCast) 
+            .ThenInclude(mc => mc.Movie)
+            .FirstOrDefault(c => c.Id == id);
+        return cast;
     }
 
 }

@@ -13,4 +13,6 @@ public interface IMovieService
     Movie GetMoviebyId(int id);
     List<string> GetMovieGenres(int id);
     decimal GetMovieRating(int id);
+    List<TrailerModel> GetMovieTrailers(int id);
+    List<MovieCastModel> GetMovieCasts(int id);
 }

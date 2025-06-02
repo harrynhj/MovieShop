@@ -20,4 +20,6 @@ public class MovieDetailsModel
     public decimal? Budget { get; set; }
     public decimal? Revenue { get; set; }
     public List<string>? Genres { get; set; }
+    public List<TrailerModel> Trailer { get; set; }
+    public List<MovieCastModel> Cast { get; set; }
 }
