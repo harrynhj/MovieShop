@@ -31,7 +31,7 @@ public class MovieRepository : Repository<Movie>, IMovieRepository
             query = query
                 .Join(_movieShopDbContext.MovieGenres,
                     movie => movie.Id,
-                    movieGenre => movieGenre.MovieId, // 修正这里
+                    movieGenre => movieGenre.MovieId,
                     (movie, movieGenre) => new { movie, movieGenre })
                 .Where(mg => mg.movieGenre.GenreId == genre)
                 .Select(mg => mg.movie)
@@ -96,4 +96,17 @@ public class MovieRepository : Repository<Movie>, IMovieRepository
 
         return casts;
     }
+
+    public bool GetPurchaseStatus(int id, int userId)
+    {
+        return _movieShopDbContext.Purchases.Any(p => p.MovieId == id && p.UserId == userId);
+    }
+
+    public bool GetFavoriteStatus(int id, int userId)
+    {
+        return _movieShopDbContext.Users
+            .Where(u => u.Id == userId)
+            .Any(u => u.Movie.Any(m => m.Id == id));
+    }
+    
 }

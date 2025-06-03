@@ -22,4 +22,6 @@ public class MovieDetailsModel
     public List<string>? Genres { get; set; }
     public List<TrailerModel> Trailer { get; set; }
     public List<MovieCastModel> Cast { get; set; }
+    public bool isOwned { get; set; }
+    public bool isFavorite { get; set; }
 }

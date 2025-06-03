@@ -1,4 +1,6 @@
-﻿using ApplicationCore.Contracts.Services;
+﻿using System.Security.Claims;
+using ApplicationCore.Contracts.Services;
+using ApplicationCore.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,14 +16,52 @@ public class AdminController : Controller
         _adminService = adminService;
     }
     
-    public IActionResult TopMovies()
+    public IActionResult TopMovies(DateTime? start = null, DateTime? end = null, int page = 1)
     {
-        return View();
+        var report = _adminService.GetSellReport(start, end, page);
+        return View(report);
     }
-
+    
     public IActionResult AddMovie()
     {
         return View();
     }
+    
+    [HttpPost]
+    public IActionResult AddMovie(NewMovieModel model)
+    {
+        string fullName = User.FindFirstValue(ClaimTypes.Name);
+        if (!ModelState.IsValid)
+        {
+            return View(model);
+        }
 
+        int movieId = _adminService.InsertMovie(model, fullName);
+        if (movieId != -1)
+        {
+            return RedirectToAction("MovieDetails", "Movies", new { id = movieId });
+        }
+        ModelState.AddModelError(string.Empty, "Add movie failed. Please try again.");
+        return View(model);
+    }
+    
+    [HttpPost]
+    public IActionResult DeleteMovie(int id)
+    {
+        _adminService.DeleteMovie(id);
+        return RedirectToAction("Index","Home");
+    }
+
+    [HttpPost]
+    public IActionResult EditPrice(MoviePriceModel model)
+    {
+        ModelState.Remove("Review");
+        ModelState.Remove("Movie");
+        if (!ModelState.IsValid)
+        {
+            return View(model);
+        }
+        _adminService.UpdatePrice(model);
+        return RedirectToAction("MovieDetails", "Movies", new { id = model.MovieId });
+    }
 }

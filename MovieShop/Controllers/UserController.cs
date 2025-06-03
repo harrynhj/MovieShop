@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Security.Claims;
 using ApplicationCore.Contracts.Services;
+using ApplicationCore.Entities;
 using ApplicationCore.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
@@ -9,108 +10,64 @@ using MovieShop.Models;
 
 namespace MovieShop.Controllers;
 
+[Authorize]
 public class UserController : Controller
 {
     private readonly IUserService _userService;
-    
-    public UserController(IUserService userService)
+    public UserController(IUserService userService, IMovieService movieService)
     {
         _userService = userService;
     }
     
-
-    public IActionResult Login()
-    {
-        return View();
-    }
-
-    public IActionResult Register()
-    {
-        return View();
-    }
-    
-    [Authorize]
     public IActionResult Profile()
     {
         return View();
     }
     [Authorize]
-    public IActionResult Favorite()
+    public IActionResult Favorite(int page = 1)
     {
-        return View();
-    }
-
-    [Authorize]
-    public IActionResult Purchase()
-    {
-        return View();
-    }
-
-
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public IActionResult Register(RegisterModel model)
-    {
-        if (!ModelState.IsValid)
-        {
-            return View(model);
-        }
-
-        if (_userService.HasDupEmail(model.Email))
-        {
-            ModelState.AddModelError("Email", "Email is already taken");
-            return View(model);
-        }
-
-        if (model.DateOfBirth > DateTime.Now)
-        {
-            ModelState.AddModelError("DateOfBirth", "Date of birth is invalid");
-            return View(model);
-        }
-        _userService.RegisterAccount(model);
-        TempData["SuccessMessage"] = "Registration successful!";
-        return RedirectToAction("Login");
+        var userId = User.Identity.IsAuthenticated ? Int32.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)) : -1;
+        var movies = _userService.GetUserFavMovies(page,userId);
+        return View(movies);
     }
     
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Login(LoginModel model)
+    public IActionResult Purchase(int page = 1)
     {
-        if (!ModelState.IsValid)
-        {
-            return View(model);
-        }
-
-        var user = _userService.AuthenticateUser(model); // 返回 User 对象
-        if (user == null)
-        {
-            ModelState.AddModelError(string.Empty, "Invalid email or password.");
-            return View(model);
-        }
-
-        var claims = new List<Claim>
-        {
-            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new Claim(ClaimTypes.Email, user.Email),
-            new Claim(ClaimTypes.Name, user.FirstName + " " + user.LastName),
-            new Claim(ClaimTypes.Role, user.role)
-        };
-
-        var claimsIdentity = new ClaimsIdentity(claims, "MyCookieAuth");
-        var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
-
-        await HttpContext.SignInAsync("MyCookieAuth", claimsPrincipal);
-
-        return RedirectToAction("Index", "Home");
+        var userId = User.Identity.IsAuthenticated ? Int32.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)) : -1;
+        var movies = _userService.GetUserPurchasedMovies(page,userId);
+        return View(movies);
     }
-
+    
+    [Authorize]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    [Authorize]
-    public async Task<IActionResult> Logout()
+    public IActionResult SubmitReview(MovieDetailPageModel model)
     {
-        await HttpContext.SignOutAsync("MyCookieAuth");
-        return RedirectToAction("Index", "Home");
+        ModelState.Remove("Movie");
+        ModelState.Remove("Price");
+        _userService.AddReview(model.Review);
+        return RedirectToAction("MovieDetails", "Movies", new { id = model.Review.MovieId });
+    }
+    
+    [Authorize]
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public IActionResult Purchase(int movieId,decimal price)
+    {
+        var userId = Int32.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+        
+        _userService.PurchaseMovie(movieId, userId, price);
+        return RedirectToAction("MovieDetails", "Movies", new { id = movieId });
+    }
+    
+    [Authorize]
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public IActionResult ToggleFavorite(int movieId)
+    {
+        var userId = Int32.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+        _userService.ToggleFavoriteMovie(movieId, userId);
+        return RedirectToAction("MovieDetails", "Movies", new { id = movieId });
     }
     
     

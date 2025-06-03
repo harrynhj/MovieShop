@@ -1,0 +1,91 @@
+@using ApplicationCore.Models
+@model ApplicationCore.Models.PaginatedModel<MovieCardModel>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<div class="rounded">
+    @if (@Model.Items.Count == 0)
+    {
+        <h1> No Favorite Movie Found </h1>
+    }
+
+    <div class="container-fluid">
+        <div class="row bg-light">
+            @foreach (var movie in Model.Items)
+            {
+                <partial name="_MovieCard" model="movie"/>
+            }
+        </div>
+    </div>
+
+    @{
+        int currentPage = Model.CurrentIndex;
+        int totalPages = Model.TotalPages;
+
+        int maxPageButtons = 5;
+        int startPage = Math.Max(1, currentPage - 2);
+        int endPage = Math.Min(totalPages, currentPage + 2);
+
+        if (totalPages > maxPageButtons)
+        {
+            if (currentPage <= 3)
+            {
+                startPage = 1;
+                endPage = 5;
+            }
+            else if (currentPage >= totalPages - 2)
+            {
+                startPage = totalPages - 4;
+                endPage = totalPages;
+            }
+        }
+    }
+    @if (@Model.Items.Count != 0)
+    {
+        <nav>
+            <ul class="pagination justify-content-left">
+
+                <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                    <a class="page-link" asp-action="Favorite" asp-route-page="1">«</a>
+                </li>
+                <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                    <a class="page-link" asp-action="Favorite" asp-route-page="@(currentPage - 1)">‹</a>
+                </li>
+
+                @if (startPage > 1)
+                {
+                    <li class="page-item">
+                        <a class="page-link" asp-action="Favorite" asp-route-page="1">1</a>
+                    </li>
+                    <li class="page-item disabled">
+                        <span class="page-link">...</span>
+                    </li>
+                }
+
+                @for (int i = startPage; i <= endPage; i++)
+                {
+                    <li class="page-item @(i == currentPage ? "active" : "")">
+                        <a class="page-link" asp-action="Favorite" asp-route-page="@i">@i</a>
+                    </li>
+                }
+
+                @if (endPage < totalPages)
+                {
+                    <li class="page-item disabled">
+                        <span class="page-link">...</span>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" asp-action="Favorite" asp-route-page="@totalPages">@totalPages</a>
+                    </li>
+                }
+
+                <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+                    <a class="page-link" asp-action="Favorite" asp-route-page="@(currentPage + 1)">›</a>
+                </li>
+                <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+                    <a class="page-link" asp-action="Favorite" asp-route-page="@totalPages">»</a>
+                </li>
+
+            </ul>
+        </nav>
+    }
+</div>

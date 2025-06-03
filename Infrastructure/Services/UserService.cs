@@ -10,60 +10,92 @@ public class UserService : IUserService
 {
     private readonly IUserRepository _userRepository;
     
-    public UserService(IUserRepository userRepository)
+    public UserService(IUserRepository userRepository,  IMovieRepository movieRepository)
     {
         _userRepository = userRepository;
     }
 
-    public bool RegisterAccount(RegisterModel model)
+
+    public bool AddReview(ReviewModel model)
     {
-        string salt = PasswordHelper.GenerateSalt();
-        string hashedPassword = PasswordHelper.HashPassword(model.Password, salt);
-        var user = new User()
+        var reviews = new Review()
         {
-            DateOfBirth = model.DateOfBirth,
-            Email = model.Email,
-            FirstName = model.FirstName,
-            HashedPassword = hashedPassword,
-            IsLocked = false,
-            LastName = model.LastName,
-            Salt = salt
+            MovieId = model.MovieId,
+            UserId = model.UserId,
+            CreatedDate = DateTime.Now,
+            Rating = model.Score,
+            ReviewText = model.Review
         };
-        _userRepository.Insert(user);
+        _userRepository.InsertReview(reviews);
+        return true;
+    }
+    
+    public bool PurchaseMovie(int movieId, int userId, decimal price)
+    {
+        var purchase = new Purchase()
+        {
+            MovieId = movieId,
+            UserId = userId,
+            PurchaseDateTime = DateTime.Now,
+            PurchaseNumber = Guid.NewGuid(),
+            TotalPrice = price,
+
+
+        };
+        _userRepository.InsertPurchase(purchase);
         return true;
     }
 
-    public UserModel AuthenticateUser(LoginModel model)
+    public bool ToggleFavoriteMovie(int movieId, int userId)
     {
-        var user = _userRepository.GetUserByEmail(model.Email);
-        if (user == null) return null;
-        var hashedInput = PasswordHelper.HashPassword(model.Password, user.Salt);
-        if (user.HashedPassword == hashedInput)
-        {
-            var role = _userRepository.GetRoleById(user.Id);
-            if (role == null)
-            {
-                role = "User";
-            }
-            return new UserModel()
-            {
-                Email = user.Email,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                Id = user.Id,
-                role = role
-            };
-        }
-        return null;
-    }
-    
-
-    public bool HasDupEmail(string email)
-    {
-        if (_userRepository.CheckEmail(email))
+        if (_userRepository.DeleteFavoriteMovie(movieId, userId))
         {
             return true;
         }
-        return false;
+        _userRepository.AddFavoriteMovie(movieId, userId);
+        return true;
+    }
+
+    public PaginatedModel<MovieCardModel> GetUserFavMovies(int pageNumber, int userId)
+    {
+        double moviesPerPage = 30;
+        var movies = _userRepository.GetFavMoviesByPage(pageNumber, userId);
+        var totalPages = (int)Math.Ceiling(_userRepository.GetFavMovieCount(userId)/ moviesPerPage);
+        var result = new PaginatedModel<MovieCardModel>();
+        
+        foreach (var movie in movies)
+        {
+            result.Items.Add(new MovieCardModel()
+            {
+                Id = movie.Id, PosterURL = movie.PosterUrl, Title = movie.Title
+            });
+        }
+        result.CurrentIndex = pageNumber;
+        result.TotalPages = totalPages;
+        return result;
+    }
+
+    public PaginatedModel<PurchasedMovieCardModel> GetUserPurchasedMovies(int pageNumber, int userId)
+    {
+        double moviesPerPage = 30;
+        var movies = _userRepository.GetPurchasedMoviesByPage(pageNumber, userId);
+        var totalPages = (int)Math.Ceiling(_userRepository.GetPurchasedMoviesCount(userId)/ moviesPerPage);
+        var result = new PaginatedModel<PurchasedMovieCardModel>();
+        
+        foreach (var movie in movies)
+        {
+            result.Items.Add(new PurchasedMovieCardModel()
+            {
+                Id = movie.Movie.Id, 
+                PosterURL = movie.Movie.PosterUrl, 
+                Title = movie.Movie.Title,
+                PurchaseDate = movie.PurchaseDateTime,
+                Price = movie.TotalPrice,
+                PurchasedNumber = movie.PurchaseNumber,
+            });
+        }
+        result.CurrentIndex = pageNumber;
+        result.TotalPages = totalPages;
+        return result;
     }
 }

@@ -13,4 +13,6 @@ public interface IMovieRepository: IRepository<Movie>
     IEnumerable<Review> GetMovieRating(int id);
     IEnumerable<Trailer> GetMovieTrailers(int id);
     IEnumerable<MovieCast> GetMovieCasts(int id);
+    bool GetPurchaseStatus(int id, int userId);
+    bool GetFavoriteStatus(int id, int userId);
 }

@@ -1,4 +1,6 @@
-﻿using ApplicationCore.Contracts.Services;
+﻿using System.Security.Claims;
+using ApplicationCore.Contracts.Services;
+using ApplicationCore.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MovieShop.Controllers;
@@ -9,9 +11,10 @@ public class MoviesController : Controller
     public MoviesController(IMovieService movieService)
     {
         _movieService = movieService;
+        
     }
         
-    // GET: MoviesController
+
     public ActionResult Index()
     {
         return View();
@@ -20,20 +23,24 @@ public class MoviesController : Controller
     [HttpGet]
     public IActionResult MovieDetails(int id)
     {
-        var movie = _movieService.GetMovieDetails(id);
-        return View(movie);
-    }
-
-    [HttpPost]
-    public IActionResult DeleteMovie(int id)
-    {
-        var movie = _movieService.GetMovieDetails(id);
+        var userId = User.Identity.IsAuthenticated ? Int32.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)) : -1;
+        var movie = _movieService.GetMovieDetails(id, userId);
         if (movie == null)
         {
-            return NotFound();
+            return RedirectToAction("Index", "Home");
         }
-
-        _movieService.DeleteMovie(id);
-        return RedirectToAction("Index","Home");
+        var review = new ReviewModel()
+        {
+            MovieId = movie.Id,
+            UserId = userId
+        };
+        var viewModel = new MovieDetailPageModel()
+        {
+            Movie = movie,
+            Review = review
+        };
+        return View(viewModel);
     }
+
+
 }

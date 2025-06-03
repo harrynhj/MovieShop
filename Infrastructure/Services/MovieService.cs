@@ -53,13 +53,21 @@ public class MovieService : IMovieService
         return result;
     }
 
-    public MovieDetailsModel GetMovieDetails(int id)
+    public MovieDetailsModel GetMovieDetails(int id, int userId)
     {
         var movie = _movieRepository.GetById(id);
         var genres = GetMovieGenres(id);
         var score = GetMovieRating(id);
         var trailers = GetMovieTrailers(id);
         var cast = GetMovieCasts(id);
+        var isOwned = false;
+        var isFavorite = false;
+        if (userId != -1)
+        {
+            isOwned = _movieRepository.GetPurchaseStatus(id,userId);
+            isFavorite = _movieRepository.GetFavoriteStatus(id, userId);
+        }
+        
         if (movie != null)
         {
             var movieDetailsModel = new MovieDetailsModel()
@@ -81,26 +89,17 @@ public class MovieService : IMovieService
                 Genres = genres,
                 Rating = score,
                 Trailer = trailers,
-                Cast = cast
+                Cast = cast,
+                isOwned = isOwned,
+                isFavorite = isFavorite
             };
             return movieDetailsModel;
         }
 
         return null;
     }
-
-
-    public bool DeleteMovie(int id)
-    {
-        var movie = _movieRepository.DeleteById(id);
-        if (movie == null)
-        {
-            return false;
-        }
-
-        return true;
-    }
-
+    
+    
     public Movie GetMoviebyId(int id)
     {
         var movie = _movieRepository.GetById(id);
@@ -170,10 +169,3 @@ public class MovieService : IMovieService
         return res;
     }
 }
-//
-// public int Id { get; set; }
-// public string Gender  { get; set; }
-// public string Name { get; set; }
-// public string ProfilePath { get; set; }
-// public string TmdbUrl { get; set; }
-// public List<MovieCardModel> Movies { get; set; }

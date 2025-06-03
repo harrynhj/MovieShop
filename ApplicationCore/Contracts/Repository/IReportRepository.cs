@@ -1,6 +1,8 @@
-﻿namespace ApplicationCore.Contracts.Repository;
+﻿using ApplicationCore.Entities;
 
-public interface IReportRepository
+namespace ApplicationCore.Contracts.Repository;
+
+public interface IReportRepository : IRepository<Purchase>
 {
-    
+    IEnumerable<Purchase> GetMovieSell(DateTime? startDate, DateTime? endDate);
 }
