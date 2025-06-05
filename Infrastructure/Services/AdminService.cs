@@ -17,9 +17,9 @@ public class AdminService : IAdminService
     }
     
     
-    public int InsertMovie(NewMovieModel movie, string userName)
+    public async Task<int> InsertMovie(NewMovieModel movie, string userName)
     {
-        Movie res = _movieRepository.Insert(new Movie()
+        Movie res = await _movieRepository.Insert(new Movie()
         {
             BackdropUrl = movie.BackdropUrl,
             Budget = movie.Budget,
@@ -42,9 +42,9 @@ public class AdminService : IAdminService
         return res.Id;
     }
     
-    public bool DeleteMovie(int id)
+    public async Task<bool> DeleteMovie(int id)
     {
-        var movie = _movieRepository.DeleteById(id);
+        var movie = await _movieRepository.DeleteById(id);
         if (movie == null)
         {
             return false;
@@ -53,20 +53,20 @@ public class AdminService : IAdminService
         return true;
     }
 
-    public bool UpdatePrice(MoviePriceModel moviePrice)
+    public async Task<bool> UpdatePrice(MoviePriceModel moviePrice)
     {
-        var movie = _movieRepository.GetById(moviePrice.MovieId);
+        var movie = await _movieRepository.GetById(moviePrice.MovieId);
         movie.Price = moviePrice.Price;
         var res = _movieRepository.Update(movie);
         if (res == null) return false;
         return true;
     }
 
-    public PaginatedModel<ReportModel> GetSellReport(DateTime? start, DateTime? end, int page)
+    public async Task<PaginatedModel<ReportModel>> GetSellReport(DateTime? start, DateTime? end, int page)
     {
         int itemsPerPage = 30;
     
-        var purchases = _reportRepository.GetMovieSell(start, end);
+        var purchases = await _reportRepository.GetMovieSell(start, end);
         
         var grouped = purchases
             .GroupBy(p => p.MovieId)

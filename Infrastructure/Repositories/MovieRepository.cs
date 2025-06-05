@@ -10,21 +10,21 @@ public class MovieRepository : Repository<Movie>, IMovieRepository
 {
     public MovieRepository(MovieShopDbContext dbContext): base(dbContext) { }
 
-    public Movie GetHighestGrossingMovies()
+    public async Task<Movie> GetHighestGrossingMovies()
     {
-        var movie = _movieShopDbContext.Movies.OrderByDescending(movie => movie.Revenue).ToList().First();
-        return movie;
+        var movie = await _movieShopDbContext.Movies.OrderByDescending(movie => movie.Revenue).ToListAsync();
+        var res = movie.First();
+        return res;
     }
 
-    public IEnumerable<Movie> GetTop20GrossingMovies()
+    public async Task<IEnumerable<Movie>> GetTop20GrossingMovies()
     {
-        var movies = _movieShopDbContext.Movies.OrderByDescending(m => m.Revenue).Take(20);
+        var movies = await _movieShopDbContext.Movies.OrderByDescending(m => m.Revenue).Take(20).ToListAsync();
         return movies;
     }
 
-    public IEnumerable<Movie> GetMoviesByPage(int pageNumber, int genre = -1)
+    public async Task<IEnumerable<Movie>> GetMoviesByPage(int pageNumber, int genre = -1, int pageSize = 30)
     {
-        int pageSize = 30;
         var query = _movieShopDbContext.Movies.AsQueryable();
         if (genre != -1)
         {
@@ -37,76 +37,76 @@ public class MovieRepository : Repository<Movie>, IMovieRepository
                 .Select(mg => mg.movie)
                 .Distinct();
         }
-        var movies = query
+        var movies = await query
             .OrderByDescending(m => m.Revenue)
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
-            .ToList();
+            .ToListAsync();
         return movies;
     }
 
-    public int GetMovieCount(int genre = -1)
+    public async Task<int> GetMovieCount(int genre = -1)
     {
         if (genre == -1)
         {
             return _movieShopDbContext.Movies.Count();
         }
-        return _movieShopDbContext.MovieGenres
+        return await _movieShopDbContext.MovieGenres
             .Where(mg => mg.GenreId == genre)
             .Select(mg => mg.MovieId)
             .Distinct()
-            .Count();
+            .CountAsync();
     }
 
-    public IEnumerable<int> GetMoviesGenres(int movie)
+    public async Task<IEnumerable<int>> GetMoviesGenres(int movie)
     {
-        var genres = _movieShopDbContext
+        var genres = await _movieShopDbContext
             .MovieGenres
             .Where(g => g.MovieId == movie)
             .Select(g => g.GenreId)
             .Distinct()
-            .ToList();
+            .ToListAsync();
         return genres;
     }
 
-    public IEnumerable<Review> GetMovieRating(int id)
+    public async Task<IEnumerable<Review>> GetMovieRating(int id)
     {
-        var reviews = _movieShopDbContext
+        var reviews = await _movieShopDbContext
             .Reviews
             .Where(r => r.MovieId == id)
-            .ToList();
+            .ToListAsync();
         return reviews;
     }
 
-    public IEnumerable<Trailer> GetMovieTrailers(int id)
+    public async Task<IEnumerable<Trailer>> GetMovieTrailers(int id)
     {
-        var trailers = _movieShopDbContext.Trailers
+        var trailers = await _movieShopDbContext.Trailers
             .Where(t => t.MovieId == id)
             .Distinct()
-            .ToList();
+            .ToListAsync();
         return trailers;
     }
 
-    public IEnumerable<MovieCast> GetMovieCasts(int movieId)
+    public async Task<IEnumerable<MovieCast>> GetMovieCasts(int movieId)
     {
-        var casts = _movieShopDbContext.MovieCasts
+        var casts = await _movieShopDbContext.MovieCasts
             .Include(mc => mc.Cast)
             .Where(mc => mc.MovieId == movieId)
-            .ToList();
+            .ToListAsync();
 
         return casts;
     }
 
-    public bool GetPurchaseStatus(int id, int userId)
+    public async Task<bool> GetPurchaseStatus(int id, int userId)
     {
-        return _movieShopDbContext.Purchases.Any(p => p.MovieId == id && p.UserId == userId);
+        return await _movieShopDbContext.Purchases.AnyAsync(p => p.MovieId == id && p.UserId == userId);
     }
 
-    public bool GetFavoriteStatus(int id, int userId)
+    public async Task<bool> GetFavoriteStatus(int id, int userId)
     {
-        return _movieShopDbContext.Users
+        return await _movieShopDbContext.Users
             .Where(u => u.Id == userId)
-            .Any(u => u.Movie.Any(m => m.Id == id));
+            .AnyAsync(u => u.Movie.Any(m => m.Id == id));
     }
     
 }

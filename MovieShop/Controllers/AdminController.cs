@@ -16,9 +16,9 @@ public class AdminController : Controller
         _adminService = adminService;
     }
     
-    public IActionResult TopMovies(DateTime? start = null, DateTime? end = null, int page = 1)
+    public async Task<IActionResult> TopMovies(DateTime? start = null, DateTime? end = null, int page = 1)
     {
-        var report = _adminService.GetSellReport(start, end, page);
+        var report = await _adminService.GetSellReport(start, end, page);
         return View(report);
     }
     
@@ -28,7 +28,7 @@ public class AdminController : Controller
     }
     
     [HttpPost]
-    public IActionResult AddMovie(NewMovieModel model)
+    public async Task<IActionResult> AddMovie(NewMovieModel model)
     {
         string fullName = User.FindFirstValue(ClaimTypes.Name);
         if (!ModelState.IsValid)
@@ -36,7 +36,7 @@ public class AdminController : Controller
             return View(model);
         }
 
-        int movieId = _adminService.InsertMovie(model, fullName);
+        int movieId = await _adminService.InsertMovie(model, fullName);
         if (movieId != -1)
         {
             return RedirectToAction("MovieDetails", "Movies", new { id = movieId });
@@ -46,14 +46,14 @@ public class AdminController : Controller
     }
     
     [HttpPost]
-    public IActionResult DeleteMovie(int id)
+    public async Task<IActionResult> DeleteMovie(int id)
     {
-        _adminService.DeleteMovie(id);
+        await _adminService.DeleteMovie(id);
         return RedirectToAction("Index","Home");
     }
 
     [HttpPost]
-    public IActionResult EditPrice(MoviePriceModel model)
+    public async Task<IActionResult> EditPrice(MoviePriceModel model)
     {
         ModelState.Remove("Review");
         ModelState.Remove("Movie");
@@ -61,7 +61,7 @@ public class AdminController : Controller
         {
             return View(model);
         }
-        _adminService.UpdatePrice(model);
+        await _adminService.UpdatePrice(model);
         return RedirectToAction("MovieDetails", "Movies", new { id = model.MovieId });
     }
 }

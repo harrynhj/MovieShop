@@ -14,9 +14,9 @@ public class CastService : ICastService
     }
     
     
-    public CastDetailsModel GetCastDetails(int id)
+    public async Task<CastDetailsModel> GetCastDetails(int id)
     {
-        var castDetail = _castRepository.GetById(id);
+        var castDetail = await _castRepository.GetById(id);
         var movies = new List<MovieCardModel>();
         foreach (var movie in castDetail.MovieCast)
         {

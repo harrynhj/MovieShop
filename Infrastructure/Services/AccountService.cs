@@ -17,7 +17,7 @@ public class AccountService : IAccountService
     }
     
     
-    public bool RegisterAccount(RegisterModel model)
+    public async Task<bool> RegisterAccount(RegisterModel model)
     {
         string salt = PasswordHelper.GenerateSalt();
         string hashedPassword = PasswordHelper.HashPassword(model.Password, salt);
@@ -31,18 +31,18 @@ public class AccountService : IAccountService
             LastName = model.LastName,
             Salt = salt
         };
-        _userRepository.Insert(user);
+        await _userRepository.Insert(user);
         return true;
     }
 
-    public UserModel AuthenticateUser(LoginModel model)
+    public async Task<UserModel> AuthenticateUser(LoginModel model)
     {
-        var user = _userRepository.GetUserByEmail(model.Email);
+        var user = await _userRepository.GetUserByEmail(model.Email);
         if (user == null) return null;
         var hashedInput = PasswordHelper.HashPassword(model.Password, user.Salt);
         if (user.HashedPassword == hashedInput)
         {
-            string? role = _userRepository.GetRoleById(user.Id);
+            string? role = await _userRepository.GetRoleById(user.Id);
             if (role == null)
             {
                 role = "User";
@@ -60,9 +60,9 @@ public class AccountService : IAccountService
     }
     
 
-    public bool HasDupEmail(string email)
+    public async Task<bool> HasDupEmail(string email)
     {
-        if (_userRepository.CheckEmail(email))
+        if (await _userRepository.CheckEmail(email))
         {
             return true;
         }

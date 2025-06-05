@@ -16,10 +16,10 @@ public class HomeController : Controller
     }
     
 
-    public IActionResult Index(int page = 1, int genre = -1)
+    public async Task<IActionResult> Index(int page = 1, int genre = -1)
     {
         // var movies= _movieService.GetTop20GrossingMovies();
-        var movies = _movieService.GetMoviesByPage(page, genre);
+        var movies = await _movieService.GetMoviesByPage(page, genre);
         return View(movies);
     }
     

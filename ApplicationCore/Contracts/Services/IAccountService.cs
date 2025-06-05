@@ -4,7 +4,7 @@ namespace ApplicationCore.Contracts.Services;
 
 public interface IAccountService
 {
-    bool RegisterAccount(RegisterModel model);
-    UserModel AuthenticateUser(LoginModel model);
-    bool HasDupEmail(string email);
+    Task<bool> RegisterAccount(RegisterModel model);
+    Task<UserModel> AuthenticateUser(LoginModel model);
+    Task<bool> HasDupEmail(string email);
 }

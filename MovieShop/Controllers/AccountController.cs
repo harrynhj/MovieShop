@@ -31,14 +31,14 @@ public class AccountController: Controller
     
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public IActionResult Register(RegisterModel model)
+    public async Task<IActionResult> Register(RegisterModel model)
     {
         if (!ModelState.IsValid)
         {
             return View(model);
         }
 
-        if (_accountService.HasDupEmail(model.Email))
+        if (await _accountService.HasDupEmail(model.Email))
         {
             ModelState.AddModelError("Email", "Email is already taken");
             return View(model);
@@ -49,7 +49,7 @@ public class AccountController: Controller
             ModelState.AddModelError("DateOfBirth", "Date of birth is invalid");
             return View(model);
         }
-        _accountService.RegisterAccount(model);
+        await _accountService.RegisterAccount(model);
         TempData["SuccessMessage"] = "Registration successful!";
         return RedirectToAction("Login");
     }
@@ -63,7 +63,7 @@ public class AccountController: Controller
             return View(model);
         }
 
-        var user = _accountService.AuthenticateUser(model);
+        var user = await _accountService.AuthenticateUser(model);
         if (user == null)
         {
             ModelState.AddModelError(string.Empty, "Invalid email or password.");

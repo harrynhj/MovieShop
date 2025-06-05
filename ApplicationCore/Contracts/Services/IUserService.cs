@@ -5,9 +5,9 @@ namespace ApplicationCore.Contracts.Services;
 
 public interface IUserService
 {
-    bool AddReview(ReviewModel model);
-    bool PurchaseMovie(int movieId, int userId, decimal price);
-    bool ToggleFavoriteMovie(int movieId, int userId);
-    PaginatedModel<MovieCardModel> GetUserFavMovies(int pageNumber, int userId);
-    PaginatedModel<PurchasedMovieCardModel> GetUserPurchasedMovies(int pageNumber, int userId);
+    Task<bool> AddReview(ReviewModel model);
+    Task<bool> PurchaseMovie(int movieId, int userId, decimal price);
+    Task<bool> ToggleFavoriteMovie(int movieId, int userId);
+    Task<PaginatedModel<MovieCardModel>> GetUserFavMovies(int pageNumber, int userId);
+    Task<PaginatedModel<PurchasedMovieCardModel>> GetUserPurchasedMovies(int pageNumber, int userId);
 }

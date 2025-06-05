@@ -13,42 +13,34 @@ public class UserRepository : Repository<User>, IUserRepository
         
     }
 
-    public bool CheckEmail(string email)
+    public async Task<bool> CheckEmail(string email)
     {
-        return _movieShopDbContext.Users.Any(u => u.Email == email);
+        return await _movieShopDbContext.Users.AnyAsync(u => u.Email == email);
     }
 
-    public User GetUserByEmail(string email)
+    public async Task<User> GetUserByEmail(string email)
     {
-        return _movieShopDbContext.Users.Where(u => u.Email == email).FirstOrDefault();
+        return await _movieShopDbContext.Users.Where(u => u.Email == email).FirstOrDefaultAsync();
     }
 
-    public string GetRoleById(int id)
+    public async Task<string> GetRoleById(int id)
     {
-        var userTask = _movieShopDbContext.Users
+        var user = await _movieShopDbContext.Users
             .Include(u => u.Role)
             .FirstOrDefaultAsync(u => u.Id == id);
-
-        var user = userTask.Result;
 
         if (user != null)
         {
             var adminRole = user.Role.FirstOrDefault(r => r.Name == "Admin");
-            if (adminRole != null)
-            {
-                return "Admin";
-            }
-            else
-            {
-                return "User";
-            }
+            return adminRole != null ? "Admin" : "User";
         }
+
         return null;
     }
 
-    public bool InsertReview(Review review)
+    public async Task<bool> InsertReview(Review review)
     {
-        var dup = _movieShopDbContext.Reviews.Any(r => r.MovieId == review.MovieId && r.UserId == review.UserId);
+        var dup = await _movieShopDbContext.Reviews.AnyAsync(r => r.MovieId == review.MovieId && r.UserId == review.UserId);
         if (dup)
         {
             _movieShopDbContext.Entry(review).State = EntityState.Modified;
@@ -57,51 +49,50 @@ public class UserRepository : Repository<User>, IUserRepository
         }
 
         _movieShopDbContext.Set<Review>().Add(review);
-        _movieShopDbContext.SaveChanges();
+        await _movieShopDbContext.SaveChangesAsync();
         return true;
     }
 
-    public bool InsertPurchase(Purchase purchase)
+    public async Task<bool> InsertPurchase(Purchase purchase)
     {
         _movieShopDbContext.Set<Purchase>().Add(purchase);
-        _movieShopDbContext.SaveChanges();
+        await _movieShopDbContext.SaveChangesAsync();
         return true;
     }
 
-    public bool DeleteFavoriteMovie(int movieId, int userId)
+    public async Task<bool> DeleteFavoriteMovie(int movieId, int userId)
     {
-        var user = _movieShopDbContext.Users
+        var user = await _movieShopDbContext.Users
             .Include(u => u.Movie)
-            .FirstOrDefault(u => u.Id == userId);
+            .FirstOrDefaultAsync(u => u.Id == userId);
         if (user == null) return false;
         var movie = user.Movie.FirstOrDefault(m => m.Id == movieId);
         if (movie == null) return false;
         user.Movie.Remove(movie);
-        _movieShopDbContext.SaveChanges();
+        await _movieShopDbContext.SaveChangesAsync();
         return true;
     }
 
-    public bool AddFavoriteMovie(int movieId, int userId)
+    public async Task<bool> AddFavoriteMovie(int movieId, int userId)
     {
-        var user = _movieShopDbContext.Users
+        var user = await _movieShopDbContext.Users
             .Include(u => u.Movie)
-            .FirstOrDefault(u => u.Id == userId);
+            .FirstOrDefaultAsync(u => u.Id == userId);
         if (user == null) return false;
         var movie = _movieShopDbContext.Movies.Find(movieId);
         if (movie == null) return false;
         if (user.Movie.Any(m => m.Id == movieId))
             return true;
         user.Movie.Add(movie);
-        _movieShopDbContext.SaveChanges();
+        await _movieShopDbContext.SaveChangesAsync();
         return true;
     }
 
-    public IEnumerable<Movie> GetFavMoviesByPage(int pageNumber, int userId)
+    public async Task<IEnumerable<Movie>> GetFavMoviesByPage(int pageNumber, int userId, int pageSize = 30)
     {
-        int pageSize = 30;
-        var user = _movieShopDbContext.Users
+        var user = await _movieShopDbContext.Users
             .Include(u => u.Movie)
-            .FirstOrDefault(u => u.Id == userId);
+            .FirstOrDefaultAsync(u => u.Id == userId);
         if (user == null || user.Movie == null)
         {
             return Enumerable.Empty<Movie>();
@@ -112,11 +103,11 @@ public class UserRepository : Repository<User>, IUserRepository
             .ToList();
     }
 
-    public int GetFavMovieCount(int userId)
+    public async Task<int> GetFavMovieCount(int userId)
     {
-        var user = _movieShopDbContext.Users
+        var user = await _movieShopDbContext.Users
             .Include(u => u.Movie)
-            .FirstOrDefault(u => u.Id == userId);
+            .FirstOrDefaultAsync(u => u.Id == userId);
 
         if (user == null)
         {
@@ -125,22 +116,21 @@ public class UserRepository : Repository<User>, IUserRepository
         return user.Movie?.Count ?? 0;
     }
 
-    public IEnumerable<Purchase> GetPurchasedMoviesByPage(int pageNumber, int userId)
+    public async Task<IEnumerable<Purchase>> GetPurchasedMoviesByPage(int pageNumber, int userId, int pageSize = 30)
     {
-        int pageSize = 30;
-        var movies = _movieShopDbContext.Purchases
+        var movies = await _movieShopDbContext.Purchases
             .Where(p => p.UserId == userId)
             .Include(p => p.Movie)
             .OrderByDescending(p => p.PurchaseDateTime)
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
-            .ToList();
+            .ToListAsync();
         return movies;
     }
 
-    public int GetPurchasedMoviesCount(int userId)
+    public async Task<int> GetPurchasedMoviesCount(int userId)
     {
-        return _movieShopDbContext.Purchases
-            .Count(p => p.UserId == userId);
+        return await _movieShopDbContext.Purchases
+            .CountAsync(p => p.UserId == userId);
     }
 }

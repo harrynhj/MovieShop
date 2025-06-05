@@ -16,7 +16,7 @@ public class UserService : IUserService
     }
 
 
-    public bool AddReview(ReviewModel model)
+    public async Task<bool> AddReview(ReviewModel model)
     {
         var reviews = new Review()
         {
@@ -26,11 +26,11 @@ public class UserService : IUserService
             Rating = model.Score,
             ReviewText = model.Review
         };
-        _userRepository.InsertReview(reviews);
+        await _userRepository.InsertReview(reviews);
         return true;
     }
     
-    public bool PurchaseMovie(int movieId, int userId, decimal price)
+    public async Task<bool> PurchaseMovie(int movieId, int userId, decimal price)
     {
         var purchase = new Purchase()
         {
@@ -42,25 +42,25 @@ public class UserService : IUserService
 
 
         };
-        _userRepository.InsertPurchase(purchase);
+        await _userRepository.InsertPurchase(purchase);
         return true;
     }
 
-    public bool ToggleFavoriteMovie(int movieId, int userId)
+    public async Task<bool> ToggleFavoriteMovie(int movieId, int userId)
     {
-        if (_userRepository.DeleteFavoriteMovie(movieId, userId))
+        if (await _userRepository.DeleteFavoriteMovie(movieId, userId))
         {
             return true;
         }
-        _userRepository.AddFavoriteMovie(movieId, userId);
+        await _userRepository.AddFavoriteMovie(movieId, userId);
         return true;
     }
 
-    public PaginatedModel<MovieCardModel> GetUserFavMovies(int pageNumber, int userId)
+    public async Task<PaginatedModel<MovieCardModel>> GetUserFavMovies(int pageNumber, int userId)
     {
         double moviesPerPage = 30;
-        var movies = _userRepository.GetFavMoviesByPage(pageNumber, userId);
-        var totalPages = (int)Math.Ceiling(_userRepository.GetFavMovieCount(userId)/ moviesPerPage);
+        var movies = await _userRepository.GetFavMoviesByPage(pageNumber, userId);
+        var totalPages = (int)Math.Ceiling(await _userRepository.GetFavMovieCount(userId)/ moviesPerPage);
         var result = new PaginatedModel<MovieCardModel>();
         
         foreach (var movie in movies)
@@ -75,11 +75,11 @@ public class UserService : IUserService
         return result;
     }
 
-    public PaginatedModel<PurchasedMovieCardModel> GetUserPurchasedMovies(int pageNumber, int userId)
+    public async Task<PaginatedModel<PurchasedMovieCardModel>> GetUserPurchasedMovies(int pageNumber, int userId)
     {
         double moviesPerPage = 30;
-        var movies = _userRepository.GetPurchasedMoviesByPage(pageNumber, userId);
-        var totalPages = (int)Math.Ceiling(_userRepository.GetPurchasedMoviesCount(userId)/ moviesPerPage);
+        var movies = await _userRepository.GetPurchasedMoviesByPage(pageNumber, userId);
+        var totalPages = (int)Math.Ceiling(await _userRepository.GetPurchasedMoviesCount(userId)/ moviesPerPage);
         var result = new PaginatedModel<PurchasedMovieCardModel>();
         
         foreach (var movie in movies)

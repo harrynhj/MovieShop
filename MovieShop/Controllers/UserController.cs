@@ -24,49 +24,49 @@ public class UserController : Controller
         return View();
     }
     [Authorize]
-    public IActionResult Favorite(int page = 1)
+    public async Task<IActionResult> Favorite(int page = 1)
     {
         var userId = User.Identity.IsAuthenticated ? Int32.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)) : -1;
-        var movies = _userService.GetUserFavMovies(page,userId);
+        var movies = await _userService.GetUserFavMovies(page,userId);
         return View(movies);
     }
     
-    public IActionResult Purchase(int page = 1)
+    public async Task<IActionResult> Purchase(int page = 1)
     {
         var userId = User.Identity.IsAuthenticated ? Int32.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)) : -1;
-        var movies = _userService.GetUserPurchasedMovies(page,userId);
+        var movies = await _userService.GetUserPurchasedMovies(page,userId);
         return View(movies);
     }
     
     [Authorize]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public IActionResult SubmitReview(MovieDetailPageModel model)
+    public async Task<IActionResult> SubmitReview(MovieDetailPageModel model)
     {
         ModelState.Remove("Movie");
         ModelState.Remove("Price");
-        _userService.AddReview(model.Review);
+        await _userService.AddReview(model.Review);
         return RedirectToAction("MovieDetails", "Movies", new { id = model.Review.MovieId });
     }
     
     [Authorize]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public IActionResult Purchase(int movieId,decimal price)
+    public async Task<IActionResult> Purchase(int movieId,decimal price)
     {
         var userId = Int32.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
         
-        _userService.PurchaseMovie(movieId, userId, price);
+        await _userService.PurchaseMovie(movieId, userId, price);
         return RedirectToAction("MovieDetails", "Movies", new { id = movieId });
     }
     
     [Authorize]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public IActionResult ToggleFavorite(int movieId)
+    public async Task<IActionResult> ToggleFavorite(int movieId)
     {
         var userId = Int32.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-        _userService.ToggleFavoriteMovie(movieId, userId);
+        await _userService.ToggleFavoriteMovie(movieId, userId);
         return RedirectToAction("MovieDetails", "Movies", new { id = movieId });
     }
     

@@ -12,7 +12,7 @@ public class ReportRepository : Repository<Purchase>, IReportRepository
         
     }
     
-    public IEnumerable<Purchase> GetMovieSell(DateTime? startDate, DateTime? endDate)
+    public async Task<IEnumerable<Purchase>> GetMovieSell(DateTime? startDate, DateTime? endDate)
     {
         var query = _movieShopDbContext.Purchases
             .Include(p => p.Movie)
@@ -28,6 +28,6 @@ public class ReportRepository : Repository<Purchase>, IReportRepository
             query = query.Where(p => p.PurchaseDateTime <= endDate.Value);
         }
 
-        return query.ToList();
+        return await query.ToListAsync();
     }
 }

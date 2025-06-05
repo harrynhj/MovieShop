@@ -18,9 +18,9 @@ public class MovieService : IMovieService
     }
 
     
-    public List<MovieCardModel> GetTop20GrossingMovies()
+    public async Task<List<MovieCardModel>> GetTop20GrossingMovies()
     {
-        var movies =  _movieRepository.GetTop20GrossingMovies();
+        var movies =  await _movieRepository.GetTop20GrossingMovies();
         var movieCardModels = new List<MovieCardModel>();
         foreach (var movie in movies)
         {
@@ -33,11 +33,11 @@ public class MovieService : IMovieService
         return movieCardModels;
     }
 
-    public PaginatedModel<MovieCardModel> GetMoviesByPage(int pageNumber, int genre = -1)
+    public async Task<PaginatedModel<MovieCardModel>> GetMoviesByPage(int pageNumber, int genre = -1)
     {
         double moviesPerPage = 30;
-        var movies = _movieRepository.GetMoviesByPage(pageNumber, genre);
-        var totalPages = (int)Math.Ceiling(_movieRepository.GetMovieCount(genre)/ moviesPerPage);
+        var movies = await _movieRepository.GetMoviesByPage(pageNumber, genre);
+        var totalPages = (int)Math.Ceiling(await _movieRepository.GetMovieCount(genre)/ moviesPerPage);
         var result = new PaginatedModel<MovieCardModel>();
         
         foreach (var movie in movies)
@@ -53,19 +53,19 @@ public class MovieService : IMovieService
         return result;
     }
 
-    public MovieDetailsModel GetMovieDetails(int id, int userId)
+    public async Task<MovieDetailsModel> GetMovieDetails(int id, int userId)
     {
-        var movie = _movieRepository.GetById(id);
-        var genres = GetMovieGenres(id);
-        var score = GetMovieRating(id);
-        var trailers = GetMovieTrailers(id);
-        var cast = GetMovieCasts(id);
+        var movie = await _movieRepository.GetById(id);
+        var genres = await GetMovieGenres(id);
+        var score = await GetMovieRating(id);
+        var trailers = await GetMovieTrailers(id);
+        var cast = await GetMovieCasts(id);
         var isOwned = false;
         var isFavorite = false;
         if (userId != -1)
         {
-            isOwned = _movieRepository.GetPurchaseStatus(id,userId);
-            isFavorite = _movieRepository.GetFavoriteStatus(id, userId);
+            isOwned = await _movieRepository.GetPurchaseStatus(id,userId);
+            isFavorite = await _movieRepository.GetFavoriteStatus(id, userId);
         }
         
         if (movie != null)
@@ -100,9 +100,9 @@ public class MovieService : IMovieService
     }
     
     
-    public Movie GetMoviebyId(int id)
+    public async Task<Movie> GetMoviebyId(int id)
     {
-        var movie = _movieRepository.GetById(id);
+        var movie = await _movieRepository.GetById(id);
         if (movie != null)
         {
             return movie;
@@ -110,10 +110,10 @@ public class MovieService : IMovieService
         return null;
     }
 
-    public List<string> GetMovieGenres(int id)
+    public async Task<List<string>> GetMovieGenres(int id)
     {
         List<string> res = new List<string>();
-        var genres = _movieRepository.GetMoviesGenres(id);
+        var genres = await _movieRepository.GetMoviesGenres(id);
         foreach (var genre in genres)
         {
             res.Add(GenreMapping.Genres[genre]);
@@ -121,10 +121,10 @@ public class MovieService : IMovieService
         return res;
     }
 
-    public decimal GetMovieRating(int id)
+    public async Task<decimal> GetMovieRating(int id)
     {
         List<decimal> ratings = new List<decimal>();
-        var reviews =  _movieRepository.GetMovieRating(id);
+        var reviews =  await _movieRepository.GetMovieRating(id);
         if (reviews.Count() == 0)
         {
             return -1;
@@ -136,10 +136,10 @@ public class MovieService : IMovieService
         return ratings.Sum() / ratings.Count;
     }
 
-    public List<TrailerModel> GetMovieTrailers(int id)
+    public async Task<List<TrailerModel>> GetMovieTrailers(int id)
     {
         List<TrailerModel> res = new List<TrailerModel>();
-        var trailers = _movieRepository.GetMovieTrailers(id);
+        var trailers = await _movieRepository.GetMovieTrailers(id);
         foreach (var trailer in trailers)
         {
             res.Add(new TrailerModel()
@@ -151,10 +151,10 @@ public class MovieService : IMovieService
         return res;
     }
 
-    public List<MovieCastModel> GetMovieCasts(int id)
+    public async Task<List<MovieCastModel>> GetMovieCasts(int id)
     {
         List<MovieCastModel> res = new List<MovieCastModel>();
-        var casts = _movieRepository.GetMovieCasts(id);
+        var casts = await _movieRepository.GetMovieCasts(id);
         foreach (var cast in casts)
         {
             res.Add(new MovieCastModel()

@@ -12,40 +12,40 @@ public class Repository<T> : IRepository<T> where T : class
         _movieShopDbContext = movieShopDbContext;
     }
     
-    public T Insert(T entity)
+    public async Task<T> Insert(T entity)
     {
         _movieShopDbContext.Set<T>().Add(entity);
-        _movieShopDbContext.SaveChanges();
+        await _movieShopDbContext.SaveChangesAsync();
         return entity;
     }
 
-    public T DeleteById(int id)
+    public async Task<T> DeleteById(int id)
     {
         var entity = _movieShopDbContext.Set<T>().Find(id);
         if (entity != null)
         {
             _movieShopDbContext.Set<T>().Remove(entity);
-            _movieShopDbContext.SaveChanges();
+            await _movieShopDbContext.SaveChangesAsync();
             return entity;
         }
 
         return null;
     }
 
-    public T Update(T entity)
+    public async Task<T> Update(T entity)
     {
         _movieShopDbContext.Entry(entity).State = EntityState.Modified;
-        _movieShopDbContext.SaveChanges();
+        await _movieShopDbContext.SaveChangesAsync();
         return entity;
     }
 
-    public IEnumerable<T> GetAll()
+    public async Task<IEnumerable<T>> GetAll()
     {
-        return _movieShopDbContext.Set<T>().ToList();
+        return await _movieShopDbContext.Set<T>().ToListAsync();
     }
 
-    public virtual T GetById(int id)
+    public virtual async Task<T> GetById(int id)
     {
-        return _movieShopDbContext.Set<T>().Find(id);
+        return await _movieShopDbContext.Set<T>().FindAsync(id);
     }
 }

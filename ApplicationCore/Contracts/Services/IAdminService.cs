@@ -5,8 +5,8 @@ namespace ApplicationCore.Contracts.Services;
 
 public interface IAdminService
 {
-    int InsertMovie(NewMovieModel movie, string userName);
-    bool DeleteMovie(int id);
-    bool UpdatePrice(MoviePriceModel moviePrice);
-    PaginatedModel<ReportModel> GetSellReport(DateTime? start, DateTime? end, int page);
+    Task<int> InsertMovie(NewMovieModel movie, string userName);
+    Task<bool> DeleteMovie(int id);
+    Task<bool> UpdatePrice(MoviePriceModel moviePrice);
+    Task<PaginatedModel<ReportModel>> GetSellReport(DateTime? start, DateTime? end, int page);
 }

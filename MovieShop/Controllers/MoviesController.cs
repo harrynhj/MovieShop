@@ -21,10 +21,10 @@ public class MoviesController : Controller
     }
 
     [HttpGet]
-    public IActionResult MovieDetails(int id)
+    public async Task<IActionResult> MovieDetails(int id)
     {
         var userId = User.Identity.IsAuthenticated ? Int32.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)) : -1;
-        var movie = _movieService.GetMovieDetails(id, userId);
+        var movie = await _movieService.GetMovieDetails(id, userId);
         if (movie == null)
         {
             return RedirectToAction("Index", "Home");
