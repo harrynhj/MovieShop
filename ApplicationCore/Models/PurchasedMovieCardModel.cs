@@ -1,4 +1,6 @@
-﻿namespace ApplicationCore.Models;
+﻿using ApplicationCore.Validators;
+
+namespace ApplicationCore.Models;
 
 public class PurchasedMovieCardModel
 {

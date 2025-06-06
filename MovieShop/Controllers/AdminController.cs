@@ -28,6 +28,7 @@ public class AdminController : Controller
     }
     
     [HttpPost]
+    [ServiceFilter(typeof(AdminActionFilter))]
     public async Task<IActionResult> AddMovie(NewMovieModel model)
     {
         string fullName = User.FindFirstValue(ClaimTypes.Name);
