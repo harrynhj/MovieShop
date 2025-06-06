@@ -1,7 +1,9 @@
 using ApplicationCore.Contracts.Repository;
 using ApplicationCore.Contracts.Services;
+using Infrastructure.Data;
 using Infrastructure.Repositories;
 using Infrastructure.Services;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,7 +20,10 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IAdminService, AdminService>();
 builder.Services.AddScoped<IReportRepository, ReportRepository>();
 builder.Services.AddScoped<IAccountService, AccountService>();
-
+builder.Services.AddDbContext<MovieShopDbContext>(options =>
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("MovieShopDbConnection"));
+});
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

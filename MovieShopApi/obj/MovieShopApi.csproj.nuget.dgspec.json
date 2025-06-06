@@ -158,6 +158,9 @@
           "net9.0": {
             "targetAlias": "net9.0",
             "projectReferences": {
+              "C:\\Users\\harry\\RiderProjects\\MovieShop\\ApplicationCore\\ApplicationCore.csproj": {
+                "projectPath": "C:\\Users\\harry\\RiderProjects\\MovieShop\\ApplicationCore\\ApplicationCore.csproj"
+              },
               "C:\\Users\\harry\\RiderProjects\\MovieShop\\Infrastructure\\Infrastructure.csproj": {
                 "projectPath": "C:\\Users\\harry\\RiderProjects\\MovieShop\\Infrastructure\\Infrastructure.csproj"
               }

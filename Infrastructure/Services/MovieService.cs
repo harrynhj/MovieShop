@@ -53,7 +53,7 @@ public class MovieService : IMovieService
         return result;
     }
 
-    public async Task<MovieDetailsModel> GetMovieDetails(int id, int userId)
+    public async Task<MovieDetailsModel> GetMovieDetails(int id, int userId = -1)
     {
         var movie = await _movieRepository.GetById(id);
         var genres = await GetMovieGenres(id);

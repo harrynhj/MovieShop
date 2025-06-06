@@ -3021,6 +3021,7 @@
   },
   "projectFileDependencyGroups": {
     "net9.0": [
+      "ApplicationCore >= 1.0.0",
       "Infrastructure >= 1.0.0",
       "Microsoft.AspNetCore.OpenApi >= 9.0.4",
       "Swashbuckle.AspNetCore.Swagger >= 8.1.4",
@@ -3053,6 +3054,9 @@
         "net9.0": {
           "targetAlias": "net9.0",
           "projectReferences": {
+            "C:\\Users\\harry\\RiderProjects\\MovieShop\\ApplicationCore\\ApplicationCore.csproj": {
+              "projectPath": "C:\\Users\\harry\\RiderProjects\\MovieShop\\ApplicationCore\\ApplicationCore.csproj"
+            },
             "C:\\Users\\harry\\RiderProjects\\MovieShop\\Infrastructure\\Infrastructure.csproj": {
               "projectPath": "C:\\Users\\harry\\RiderProjects\\MovieShop\\Infrastructure\\Infrastructure.csproj"
             }
